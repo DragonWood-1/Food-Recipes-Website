@@ -1,8 +1,8 @@
 # Global Kitchen — Food Recipes Website
 
-A fast, dependency-free recipe website with **5,900+ recipes** organized into
-seven cuisine columns, plus dedicated collections for **30-minute meals** and
-**crock pot meals**.
+A fast, dependency-free recipe website with **6,900+ recipes** organized into
+seven cuisine columns, plus dedicated collections for **30-minute meals**,
+**crock pot meals**, and **desserts**.
 
 ## Cuisine columns
 
@@ -18,11 +18,15 @@ seven cuisine columns, plus dedicated collections for **30-minute meals** and
 
 ## Features
 
-- **5,900+ recipes** generated deterministically from per-cuisine dish
+- **6,900+ recipes** generated deterministically from per-cuisine dish
   templates (`data.js`), so the site stays a few hundred KB instead of
   shipping a multi-megabyte database.
 - **⏱️ 30-Minute Meals** — 1,500+ recipes ready in half an hour or less.
 - **🍲 Crock Pot Meals** — 1,100+ slow-cooker recipes.
+- **🍰 Desserts** — 1,080 traditional sweets, 40 from each of the 27
+  sub-cuisines (gulab jamun, tiramisu, knafeh, mochi, beignets, marionberry
+  cobbler…), each in Classic, 30-Minute, Make-Ahead, Mini, and Holiday
+  versions.
 - Search across all recipes, plus filters for quick meals, crock pot,
   and vegetarian, with sorting by name, time, or difficulty.
 - Full recipe detail view with ingredients and step-by-step instructions

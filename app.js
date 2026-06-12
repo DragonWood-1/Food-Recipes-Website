@@ -72,6 +72,37 @@ const CUISINE_INDEX = {};
           }
         }
       }
+      // Desserts: every traditional dessert gets each dessert variant.
+      for (const dessert of sub.desserts) {
+        for (const variant of DESSERT_VARIANTS) {
+          const seed = hashStr(sub.id + "|dessert|" + dessert + "|" + variant.id);
+          const r = rng(seed);
+          const time = rint(r, variant.time[0], variant.time[1]);
+          const recipe = {
+            id: RECIPES.length,
+            name: `${variant.label} ${dessert}`,
+            cuisineId: cuisine.id,
+            subId: sub.id,
+            cuisineName: cuisine.name,
+            subName: sub.name,
+            flag: sub.flag,
+            dish: dessert, protein: null,
+            course: "dessert",
+            styleLabel: variant.label,
+            method: variant.method,
+            time,
+            servings: rint(r, 4, 12),
+            difficulty: variant.method === "chilled" ? 1 : rint(r, 1, 3),
+            vegetarian: true,
+            aromatic: pick(r, sub.sweet),
+            staple: pick(r, sub.sweet),
+            seed
+          };
+          RECIPES.push(recipe);
+          SUB_INDEX[sub.id].recipes.push(recipe);
+          CUISINE_INDEX[cuisine.id].recipes.push(recipe);
+        }
+      }
     }
   }
 })();
@@ -89,7 +120,52 @@ const PANTRY = ["olive oil", "kosher salt", "black pepper", "yellow onion, diced
 const VEG_ADDONS = ["bell pepper, sliced", "carrots, sliced", "snap peas", "broccoli florets", "zucchini, chopped", "spinach", "green beans, trimmed", "cherry tomatoes, halved", "mushrooms, sliced", "red onion, sliced"];
 const FINISHERS = ["fresh herbs, chopped, to garnish", "a squeeze of fresh citrus", "toasted nuts or seeds", "a drizzle of good oil", "thinly sliced scallions", "chili flakes, to taste"];
 
+const SWEET_PANTRY = ["all-purpose flour", "granulated sugar", "unsalted butter", "large eggs", "whole milk or cream", "a pinch of salt"];
+const SWEET_FINISHERS = ["a dusting of powdered sugar", "fresh fruit or berries", "toasted nuts", "a drizzle of syrup or honey", "whipped cream", "a scoop of ice cream"];
+
+function buildDessertDetail(rec) {
+  const r = rng(rec.seed ^ 0x9e3779b9);
+  const ingredients = [
+    `${rint(r, 1, 2)} cup${r() > 0.5 ? "s" : ""} ${SWEET_PANTRY[0]} (or the traditional base for ${rec.dish.toLowerCase()})`,
+    `${rint(r, 1, 2)}/2 cup ${SWEET_PANTRY[1]}`,
+    `${rint(r, 4, 8)} tbsp ${SWEET_PANTRY[2]}`,
+    `${rint(r, 2, 4)} ${SWEET_PANTRY[3]}`,
+    `1 cup ${SWEET_PANTRY[4]}`,
+    `${SWEET_PANTRY[5]}`,
+    `Signature flavor: ${rec.aromatic}`,
+    `${pick(r, SWEET_FINISHERS)}, to serve`
+  ];
+  let steps;
+  if (rec.method === "chilled") {
+    steps = [
+      `Whisk together the base ingredients with the ${rec.aromatic} until smooth.`,
+      `Assemble in the traditional shape of ${rec.dish.toLowerCase()} — layered, molded, or portioned into cups.`,
+      `Cover and chill for at least 2 hours (or overnight) until fully set.`,
+      `Just before serving, add the finishing touch and a little extra ${rec.aromatic}.`,
+      `Serve cold — this one is even better made a day ahead.`
+    ];
+  } else if (rec.method === "stovetop") {
+    steps = [
+      `Combine the base ingredients in a saucepan or skillet with the ${rec.aromatic}.`,
+      `Cook over medium heat, stirring often, until thickened, golden, or cooked through as ${rec.dish.toLowerCase()} requires.`,
+      `Work quickly to shape or portion while warm.`,
+      `Finish with the topping and serve within ${rec.time} minutes of starting — this is the fast version.`
+    ];
+  } else {
+    steps = [
+      `Preheat the oven to ${pick(r, [325, 350, 375])}°F (${pick(r, [165, 175, 190])}°C). Prepare your pan${rec.styleLabel === "Mini" ? "s — use a muffin tin or small ramekins for individual portions" : ""}.`,
+      `Cream the butter and sugar, then beat in the eggs. Fold in the dry ingredients and the ${rec.aromatic}.`,
+      `Assemble in the traditional style of ${rec.dish.toLowerCase()}.`,
+      `Bake for ${rec.time - 15}–${rec.time - 5} minutes, until set and fragrant.`,
+      `Cool before finishing with the topping${rec.styleLabel === "Holiday" ? " — decorate generously, this is the celebration version" : ""}.`,
+      `Serve and enjoy.`
+    ];
+  }
+  return { ingredients, steps };
+}
+
 function buildRecipeDetail(rec) {
+  if (rec.course === "dessert") return buildDessertDetail(rec);
   const r = rng(rec.seed ^ 0x9e3779b9);
   const qty = (lo, hi, unit) => `${rint(r, lo, hi)} ${unit}`;
   const ingredients = [
@@ -180,6 +256,7 @@ function renderColumns() {
           <p class="col-blurb">${c.blurb}</p>
         </div>
         <ul class="sub-list">${subs}</ul>
+        <button class="col-desserts" data-desserts="${c.id}">🍰 ${CUISINE_INDEX[c.id].recipes.filter((x) => x.course === "dessert").length} ${c.name} desserts</button>
         <button class="col-all" data-cuisine="${c.id}">View all ${total.toLocaleString()} ${c.name} recipes →</button>
       </div>`;
   }).join("");
@@ -188,8 +265,9 @@ function renderColumns() {
 /* ---------- Recipe scope resolution ---------- */
 function currentRecipes() {
   let list;
-  if (state.quick === "quick30") list = RECIPES.filter((x) => x.time <= 30);
+  if (state.quick === "quick30") list = RECIPES.filter((x) => x.time <= 30 && x.course !== "dessert");
   else if (state.quick === "crockpot") list = RECIPES.filter((x) => x.method === "crockpot");
+  else if (state.quick === "desserts") list = RECIPES.filter((x) => x.course === "dessert");
   else if (state.quick === "all") list = RECIPES;
   else if (state.scope?.type === "sub") list = SUB_INDEX[state.scope.id].recipes;
   else if (state.scope?.type === "cuisine") list = CUISINE_INDEX[state.scope.id].recipes;
@@ -206,6 +284,7 @@ function currentRecipes() {
   if ($("filter30").checked) list = list.filter((x) => x.time <= 30);
   if ($("filterCrock").checked) list = list.filter((x) => x.method === "crockpot");
   if ($("filterVeg").checked) list = list.filter((x) => x.vegetarian);
+  if ($("filterDessert").checked) list = list.filter((x) => x.course === "dessert");
 
   const sort = $("sortSelect").value;
   list = list.slice();
@@ -226,6 +305,7 @@ function renderBrowser() {
   if (state.search) { title = `Search: “${state.search}”`; sub = ""; }
   else if (state.quick === "quick30") { title = "⏱️ 30-Minute Meals"; sub = "On the table in half an hour or less."; }
   else if (state.quick === "crockpot") { title = "🍲 Crock Pot Meals"; sub = "Set it in the morning, eat well tonight."; }
+  else if (state.quick === "desserts") { title = "🍰 Desserts"; sub = "Traditional sweets from every cuisine."; }
   else if (state.quick === "all") { title = "📖 All Recipes"; sub = "Every recipe in the library."; }
   else if (state.scope?.type === "sub") { const s = SUB_INDEX[state.scope.id]; title = `${s.sub.flag} ${s.sub.name} Recipes`; sub = `Part of our ${s.cuisine.name} collection.`; }
   else if (state.scope?.type === "cuisine") { const c = CUISINE_INDEX[state.scope.id]; title = `${c.cuisine.icon} ${c.cuisine.name} Recipes`; sub = c.cuisine.blurb; }
@@ -239,14 +319,15 @@ function renderBrowser() {
       <div class="card-top" style="--accent:${CUISINE_INDEX[x.cuisineId].cuisine.color}">
         <span class="card-flag">${x.flag}</span>
         <div class="card-badges">
+          ${x.course === "dessert" ? '<span class="badge badge-dessert">🍰 Dessert</span>' : ""}
           ${x.time <= 30 ? '<span class="badge badge-quick">⏱️ 30 min</span>' : ""}
           ${x.method === "crockpot" ? '<span class="badge badge-crock">🍲 Crock Pot</span>' : ""}
-          ${x.vegetarian ? '<span class="badge badge-veg">🥦 Veg</span>' : ""}
+          ${x.vegetarian && x.course !== "dessert" ? '<span class="badge badge-veg">🥦 Veg</span>' : ""}
         </div>
       </div>
       <h3>${x.name}</h3>
       <p class="card-meta">${x.subName} · ${fmtTime(x.time)} · ${DIFF[x.difficulty]} · Serves ${x.servings}</p>
-      <p class="card-flavor">Featuring ${x.aromatic}, served with ${x.staple}.</p>
+      <p class="card-flavor">${x.course === "dessert" ? `A traditional sweet with ${x.aromatic}.` : `Featuring ${x.aromatic}, served with ${x.staple}.`}</p>
     </article>`).join("") || `<p class="empty">No recipes match those filters — try removing one.</p>`;
 
   $("pageInfo").textContent = `Page ${state.page + 1} of ${pages}`;
@@ -262,7 +343,7 @@ function renderBrowser() {
 function goHome() {
   state = { scope: null, page: 0, search: "", quick: null };
   $("searchInput").value = "";
-  $("filter30").checked = $("filterCrock").checked = $("filterVeg").checked = false;
+  $("filter30").checked = $("filterCrock").checked = $("filterVeg").checked = $("filterDessert").checked = false;
   browserEl.classList.add("hidden");
   columnsEl.classList.remove("hidden");
   document.querySelector(".hero").classList.remove("hidden");
@@ -280,8 +361,8 @@ function openRecipe(id) {
       <span>⏱️ ${fmtTime(rec.time)}</span>
       <span>🍽️ Serves ${rec.servings}</span>
       <span>📊 ${DIFF[rec.difficulty]}</span>
-      <span>${rec.method === "crockpot" ? "🍲 Crock pot" : rec.method === "grill" ? "🔥 Grill" : rec.method === "oven" ? "♨️ Oven" : "🍳 Stovetop"}</span>
-      ${rec.vegetarian ? "<span>🥦 Vegetarian</span>" : ""}
+      <span>${rec.method === "crockpot" ? "🍲 Crock pot" : rec.method === "grill" ? "🔥 Grill" : rec.method === "oven" ? "♨️ Oven" : rec.method === "chilled" ? "🧊 Chilled" : "🍳 Stovetop"}</span>
+      ${rec.course === "dessert" ? "<span>🍰 Dessert</span>" : rec.vegetarian ? "<span>🥦 Vegetarian</span>" : ""}
     </div>
     <div class="modal-cols">
       <div>
@@ -308,8 +389,14 @@ $("heroCount").textContent = RECIPES.length.toLocaleString();
 
 columnsEl.addEventListener("click", (e) => {
   const subBtn = e.target.closest("[data-sub]");
+  const dessertBtn = e.target.closest("[data-desserts]");
   const allBtn = e.target.closest("[data-cuisine]");
   if (subBtn) { state = { ...state, scope: { type: "sub", id: subBtn.dataset.sub }, quick: null, page: 0 }; renderBrowser(); }
+  else if (dessertBtn) {
+    state = { ...state, scope: { type: "cuisine", id: dessertBtn.dataset.desserts }, quick: null, page: 0 };
+    $("filterDessert").checked = true;
+    renderBrowser();
+  }
   else if (allBtn) { state = { ...state, scope: { type: "cuisine", id: allBtn.dataset.cuisine }, quick: null, page: 0 }; renderBrowser(); }
 });
 
@@ -331,7 +418,7 @@ $("searchInput").addEventListener("input", (e) => {
   }, 200);
 });
 
-["filter30", "filterCrock", "filterVeg", "sortSelect"].forEach((id) =>
+["filter30", "filterCrock", "filterVeg", "filterDessert", "sortSelect"].forEach((id) =>
   $(id).addEventListener("change", () => { state.page = 0; renderBrowser(); }));
 
 $("prevPage").addEventListener("click", () => { state.page--; renderBrowser(); });

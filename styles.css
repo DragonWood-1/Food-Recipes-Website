@@ -98,6 +98,12 @@ h1, h2, h3 { font-family: "Playfair Display", Georgia, serif; }
   background: color-mix(in srgb, var(--accent) 10%, white);
   padding: 2px 9px; border-radius: 999px;
 }
+.col-desserts {
+  margin: 4px 12px 0; padding: 9px; cursor: pointer;
+  background: #fde2ec; color: #b03a64; border: none; font-weight: 600;
+  font-family: inherit; border-radius: 9px; font-size: 0.86rem; transition: filter 0.12s;
+}
+.col-desserts:hover { filter: brightness(0.97); }
 .col-all {
   margin: 8px 12px 14px; padding: 10px; border: none; cursor: pointer;
   background: var(--accent); color: #fff; font-weight: 600; font-family: inherit;
@@ -152,6 +158,7 @@ h1, h2, h3 { font-family: "Playfair Display", Georgia, serif; }
 .badge-quick { background: #fdebd0; color: #9c640c; }
 .badge-crock { background: #e8daef; color: #6c3483; }
 .badge-veg { background: #d5f5e3; color: #1e8449; }
+.badge-dessert { background: #fde2ec; color: #b03a64; }
 .card h3 { font-size: 1.05rem; line-height: 1.3; margin-bottom: 6px; }
 .card-meta { font-size: 0.8rem; color: var(--ink-soft); font-weight: 500; }
 .card-flavor { font-size: 0.83rem; color: var(--ink-soft); margin-top: 8px; }
