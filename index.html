@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Kitchen — 5,000+ Recipes from Around the World</title>
+  <meta name="description" content="Explore over 5,000 recipes organized by cuisine: Asian, European, Latin American, Middle Eastern & African, Regional Chinese, Regional Indian, and Regional American. Plus 30-minute meals and crock pot favorites." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#" id="brandHome">
+        <span class="brand-icon">🍳</span>
+        <span class="brand-name">Global Kitchen</span>
+      </a>
+      <div class="search-wrap">
+        <input type="search" id="searchInput" placeholder="Search 5,000+ recipes… (e.g. pad thai, biryani, gumbo)" autocomplete="off" />
+      </div>
+      <div class="recipe-count-badge" id="totalCount">…</div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Cook the World, One Recipe at a Time</h1>
+    <p>Over <strong id="heroCount">5,000</strong> recipes across 27 cuisines — from Sichuan street food to Cajun classics.</p>
+    <div class="quick-filters">
+      <button class="chip chip-quick" data-quick="quick30">⏱️ 30-Minute Meals</button>
+      <button class="chip chip-quick" data-quick="crockpot">🍲 Crock Pot Meals</button>
+      <button class="chip chip-quick" data-quick="all">📖 Browse All Recipes</button>
+    </div>
+  </section>
+
+  <main>
+    <!-- Cuisine columns: one column per cuisine family -->
+    <section id="cuisineColumns" class="cuisine-columns" aria-label="Browse by cuisine"></section>
+
+    <!-- Recipe browser (hidden until a cuisine/filter/search is chosen) -->
+    <section id="browser" class="browser hidden">
+      <div class="browser-head">
+        <button id="backBtn" class="back-btn">← All Cuisines</button>
+        <h2 id="browserTitle"></h2>
+        <p id="browserSub" class="browser-sub"></p>
+      </div>
+      <div class="filter-bar">
+        <label><input type="checkbox" id="filter30" /> ⏱️ 30 minutes or less</label>
+        <label><input type="checkbox" id="filterCrock" /> 🍲 Crock pot</label>
+        <label><input type="checkbox" id="filterVeg" /> 🥦 Vegetarian</label>
+        <select id="sortSelect">
+          <option value="name">Sort: A–Z</option>
+          <option value="time">Sort: Quickest first</option>
+          <option value="difficulty">Sort: Easiest first</option>
+        </select>
+      </div>
+      <div id="recipeGrid" class="recipe-grid"></div>
+      <div class="pager">
+        <button id="prevPage">← Prev</button>
+        <span id="pageInfo"></span>
+        <button id="nextPage">Next →</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Recipe detail modal -->
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal" role="dialog" aria-modal="true">
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>Global Kitchen — a recipe library spanning Asia, Europe, Latin America, the Middle East &amp; Africa, and regional traditions of China, India, and America.</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
