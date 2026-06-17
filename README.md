@@ -1,6 +1,6 @@
 # Global Kitchen — Food Recipes Website
 
-A fast, dependency-free recipe website with **6,900+ recipes** organized into
+A fast, dependency-free recipe website with **7,000+ recipes** organized into
 seven cuisine columns, plus dedicated collections for **30-minute meals**,
 **crock pot meals**, and **desserts**.
 
@@ -18,7 +18,7 @@ seven cuisine columns, plus dedicated collections for **30-minute meals**,
 
 ## Features
 
-- **6,900+ recipes** generated deterministically from per-cuisine dish
+- **7,000+ recipes** generated deterministically from per-cuisine dish
   templates (`data.js`), so the site stays a few hundred KB instead of
   shipping a multi-megabyte database.
 - **⏱️ 30-Minute Meals** — 1,500+ recipes ready in half an hour or less.

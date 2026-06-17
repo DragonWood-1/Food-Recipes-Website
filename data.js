@@ -98,7 +98,7 @@ const CUISINE_DATA = [
       {
         id: "spanish", name: "Spanish", flag: "🇪🇸",
         dishes: ["Paella", "Tortilla Española", "Gambas al Ajillo", "Patatas Bravas", "Albondigas", "Gazpacho", "Pisto", "Fabada Stew", "Pollo al Ajillo", "Empanadas", "Croquetas", "Romesco Grill"],
-        proteins: ["Chicken", "Shrimp", "Chorizo", "Pork", "Mussels", "Vegetable", "White Bean"],
+        proteins: ["Chicken", "Shrimp", "Chorizo", "Pork", "Beef", "Mussels", "Vegetable", "White Bean"],
         aromatics: ["smoked paprika and saffron", "garlic and sherry", "romesco pepper", "olive and tomato sofrito", "manchego and herbs"],
         staples: ["bomba rice", "crusty bread", "fried potatoes", "saffron rice"],
         desserts: ["Churros con Chocolate", "Flan", "Crema Catalana", "Torrijas", "Basque Cheesecake", "Arroz con Leche", "Tarta de Santiago", "Leche Frita"],
@@ -107,7 +107,7 @@ const CUISINE_DATA = [
       {
         id: "greek", name: "Greek", flag: "🇬🇷",
         dishes: ["Souvlaki", "Moussaka", "Gyro Platter", "Spanakopita", "Avgolemono Soup", "Greek Salad Bowl", "Pastitsio", "Lemon Roast", "Dolmades", "Briam", "Keftedes", "Fasolada"],
-        proteins: ["Chicken", "Lamb", "Pork", "Feta", "Chickpea", "Eggplant", "White Bean"],
+        proteins: ["Chicken", "Lamb", "Beef", "Pork", "Feta", "Chickpea", "Eggplant", "White Bean"],
         aromatics: ["lemon-oregano", "garlic-yogurt tzatziki", "dill and mint", "kalamata olive and tomato", "cinnamon-spiced tomato"],
         staples: ["pita bread", "lemon potatoes", "orzo", "rice pilaf"],
         desserts: ["Baklava", "Galaktoboureko", "Loukoumades", "Portokalopita (Orange Cake)", "Rizogalo", "Kataifi", "Halva", "Melomakarona"],
@@ -296,7 +296,7 @@ const CUISINE_DATA = [
       {
         id: "cajun", name: "Cajun / Creole", flag: "🎷",
         dishes: ["Gumbo", "Jambalaya", "Étouffée", "Red Beans and Rice", "Blackened Skillet", "Po' Boy", "Dirty Rice", "Shrimp Creole Style", "Maque Choux", "Boudin-Style Rice", "Court Bouillon", "Cajun Pasta"],
-        proteins: ["Shrimp", "Chicken", "Andouille Sausage", "Crawfish", "Catfish", "Red Bean", "Vegetable"],
+        proteins: ["Shrimp", "Chicken", "Andouille Sausage", "Beef", "Crawfish", "Catfish", "Red Bean", "Vegetable"],
         aromatics: ["cajun holy trinity (onion, celery, bell pepper)", "dark roux", "blackening spice", "creole tomato base", "hot sauce and butter"],
         staples: ["long-grain rice", "french bread", "cornbread", "grits"],
         desserts: ["Beignets", "Bananas Foster", "Bread Pudding with Bourbon Sauce", "King Cake", "Pecan Pie", "Pralines", "Calas (Rice Fritters)", "Doberge Cake"],
