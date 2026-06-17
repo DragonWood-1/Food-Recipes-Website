@@ -33,6 +33,20 @@ seven cuisine columns, plus dedicated collections for **30-minute meals**,
   tailored to the cooking method (stovetop, oven, grill, or crock pot).
 - Responsive layout — columns collapse gracefully on mobile.
 
+## Browse hubs (top navigation)
+
+Beyond cuisine, every recipe is cross-tagged so the same library can be
+browsed three more ways from the top nav:
+
+- **Categories** — Breakfast, Lunch, Dinner, Dessert, Slow Cooker, Air Fryer,
+  Vegan, Keto, Gluten-Free, Mediterranean.
+- **Ingredients Hub** — Chicken, Ground Beef, Salmon, Shrimp, Potato, Rice, Pasta.
+- **Seasonal Hubs** — Summer, Fall, Thanksgiving, Christmas, Easter.
+
+Tags are derived in `app.js` (`applyTags`) from each recipe's dish, protein,
+cooking method, and flavors, so every menu item routes to a live, filtered
+result set with its own count.
+
 ## Running locally
 
 It's a static site — no build step. Either open `index.html` directly, or:

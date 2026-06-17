@@ -52,6 +52,41 @@ h1, h2, h3 { font-family: "Playfair Display", Georgia, serif; }
   background: var(--ink); color: #fff; padding: 6px 14px; border-radius: 999px;
 }
 
+/* ---------- Main nav (Categories / Ingredients / Seasonal) ---------- */
+.main-nav {
+  background: var(--ink); border-bottom: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
+  padding: 6px 24px;
+}
+.nav-home, .nav-trigger {
+  background: none; border: none; color: #fff; cursor: pointer;
+  font-family: inherit; font-size: 0.92rem; font-weight: 600;
+  padding: 9px 14px; border-radius: 8px; transition: background 0.12s;
+}
+.nav-home:hover, .nav-trigger:hover { background: rgba(255, 255, 255, 0.12); }
+.nav-group { position: relative; }
+.nav-group.open .nav-trigger { background: rgba(255, 255, 255, 0.16); }
+.caret { font-size: 0.7rem; opacity: 0.8; }
+.nav-menu {
+  position: absolute; top: calc(100% + 4px); left: 0; min-width: 250px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: var(--shadow-lift); padding: 6px; display: none; z-index: 60;
+}
+.nav-group.open .nav-menu { display: block; }
+.nav-item {
+  display: flex; justify-content: space-between; align-items: center; gap: 14px;
+  width: 100%; text-align: left; border: none; background: none; cursor: pointer;
+  font-family: inherit; font-size: 0.9rem; color: var(--ink);
+  padding: 9px 12px; border-radius: 8px; transition: background 0.12s;
+}
+.nav-item:hover { background: var(--bg); }
+.nav-count {
+  font-size: 0.72rem; font-weight: 700; color: var(--ink-soft);
+  background: var(--bg); padding: 2px 8px; border-radius: 999px;
+}
+.nav-group.open .nav-menu { animation: navIn 0.12s ease; }
+@keyframes navIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
 /* ---------- Hero ---------- */
 .hero {
   text-align: center; padding: 56px 24px 40px;

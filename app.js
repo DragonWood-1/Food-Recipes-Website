@@ -22,6 +22,85 @@ function rng(seed) {
 function pick(r, arr) { return arr[Math.floor(r() * arr.length)]; }
 function rint(r, min, max) { return min + Math.floor(r() * (max - min + 1)); }
 
+/* ---------- Cross-cutting tags ----------
+   The same recipes are browsable three extra ways: by Category
+   (meal/diet/appliance), by main Ingredient, and by Season. These tags are
+   derived from each recipe's dish, protein, cooking method, and flavors. */
+const BREAKFAST_RE = /congee|miso soup|onigiri|menemen|shakshuka|chilaquiles|migas|upma|dosa|uttapam|idli|omelette|manakish|pão de queijo|pao de queijo|porridge|curd rice/i;
+const BREAKFAST_SWEET_RE = /pancake|waffle|beignet|concha|hotteok|donut|doughnut|sfenj|berliner|madeleine|scone|churro|taiyaki|dorayaki/i;
+const LUNCHY_RE = /soup|salad|sandwich|bowl|wrap|taco|banh mi|po' boy|po'boy|roll|pita|gyro|shawarma|\bbun\b|chowder|pho|noodle/i;
+const NOSOUP_RE = /soup|stew|congee|broth|chowder|jhol|\bdal\b|sambar|rasam|gumbo|hot pot|jjigae|tom yum|tom kha|pho|harira|pozole|canh|bisque/i;
+const NONVEGAN_RE = /yogurt|cream|butter|cheese|milk|ghee|honey|mascarpone|custard|condensed|egg/i;
+const VEGAN_SWEET_RE = /coconut|fruit|mango|berry|sorbet|sago|fig|date|tapioca|lime|passion|açaí|acai|guava|pandan/i;
+const KETO_BLOCK_RE = /rice|noodle|bread|naan|roti|pita|tortilla|pasta|spaghetti|penne|dumpling|\bbun\b|taco|burrito|pav|samosa|couscous|bulgur|pancake|sandwich|jambalaya|paella|biryani|risotto|congee|lo mein|ramen|udon|chow|pho|wonton|spring roll|dosa|idli|uttapam|frankie|empanada|croqueta|coxinha|pide|lahmacun|manakish|börek|borek|pierogi|po'boy|po' boy|frito|nacho|quesadilla|enchilada|tamale|gnocchi|spätzle|spatzle/i;
+const CARB_PROTEINS = new Set(["Chickpea", "Lentil", "Black Bean", "White Bean", "Kidney Bean", "Red Bean", "Potato", "Quinoa", "Sprouted Bean"]);
+const DAIRY_EGG = new Set(["Paneer", "Feta", "Halloumi", "Egg"]);
+const GLUTEN_DISH_RE = /noodle|lo mein|chow mein|chow fun|ramen|udon|soba|yakisoba|wonton|dumpling|gyoza|momo|spring roll|cha gio|schnitzel|katsu|tempura|pancake|okonomiyaki|pajeon|börek|borek|pide|lahmacun|manakish|pita|naan|roti|baguette|\bbread\b|sandwich|po' boy|po'boy|banh mi|pasta|lasagna|spaghetti|carbonara|gnocchi|spätzle|spatzle|\bpav\b|frankie|samosa|empanada|croqueta|coxinha|pierogi|manti|crêpe|crepe|waffle|beignet|churro|baklav|cannoli|strudel|donut|doughnut|berliner|sfenj|cake|cookie|\bpie\b|tart|zeppole|profiterole|madeleine|jalebi|gulab jamun|maamoul|chebakia|ghriba|biscuit|scone|brioche|panettone|stollen|lebkuchen|toast|burger|wrap|gozleme|simit|pretzel|galette|cobbler|crumble|crisp|shortcake|bread pudding|frito|nacho|quesadilla|enchilada|tostada|sopaipilla|sopapilla|concha|frankie|revani/i;
+const GLUTEN_STAPLE_RE = /flour tortilla|noodle|bread|naan|pita|baguette|pasta|spaghetti|penne|spätzle|spatzle|\bbun\b|pav|couscous|bulgur|simit|ciabatta|khobz|luchi|bhakri|panko|crust|wheat/i;
+const MED_SUBS = new Set(["greek", "italian", "spanish", "french", "lebanese", "turkish", "moroccan"]);
+
+function applyTags(rec) {
+  const dish = rec.dish.toLowerCase();
+  const staple = (rec.staple || "").toLowerCase();
+  const arom = (rec.aromatic || "").toLowerCase();
+  const text = dish + " " + arom;
+  const dessert = rec.course === "dessert";
+
+  // --- Ingredient hub ---
+  const ing = [];
+  if (rec.protein === "Chicken") ing.push("chicken");
+  if (rec.protein === "Beef") ing.push("beef");
+  if (rec.protein === "Salmon") ing.push("salmon");
+  if (rec.protein === "Shrimp") ing.push("shrimp");
+  if (rec.protein === "Potato" || /potato|aloo|batata|\bpapa\b|fingerling/.test(dish) || /potato/.test(staple)) ing.push("potato");
+  if (/risotto|paella|congee|biryani|pilaf|pilav|chaufa|jambalaya|bibimbap|fried rice|arroz/.test(dish) || (/rice/.test(staple) && !/noodle|paper/.test(staple))) ing.push("rice");
+  if (/pasta|lasagna|noodle|lo mein|chow fun|chow mein|carbonara|gnocchi|spätzle|spatzle|japchae|pad thai|drunken noodle|dan dan|macaroni|piccata|marsala|parmigiana|arrabbiata|pomodoro/.test(dish) || /noodle|spaghetti|penne|pasta|spätzle|spatzle/.test(staple)) ing.push("pasta");
+  rec.ingredientTags = ing;
+
+  // --- Meals (a recipe can be more than one) ---
+  const meals = [];
+  if (!dessert && BREAKFAST_RE.test(dish)) meals.push("breakfast");
+  if (dessert && BREAKFAST_SWEET_RE.test(dish)) meals.push("breakfast");
+  if (!dessert) {
+    meals.push("dinner");
+    if (rec.time <= 40 || LUNCHY_RE.test(dish)) meals.push("lunch");
+  }
+  rec.mealTags = meals;
+
+  // --- Appliance ---
+  const appliance = [];
+  if (rec.method === "crockpot") appliance.push("slowcooker");
+  if (!dessert && rec.method !== "crockpot" && !NOSOUP_RE.test(dish)) appliance.push("airfryer");
+  rec.applianceTags = appliance;
+
+  // --- Diets ---
+  const diets = [];
+  if (MED_SUBS.has(rec.subId)) diets.push("mediterranean");
+  if (rec.vegetarian && !DAIRY_EGG.has(rec.protein)) {
+    if (!dessert && !NONVEGAN_RE.test(arom)) diets.push("vegan");
+    else if (dessert && VEGAN_SWEET_RE.test(text)) diets.push("vegan");
+  }
+  if (!dessert && !CARB_PROTEINS.has(rec.protein) && !KETO_BLOCK_RE.test(dish)) diets.push("keto");
+  if (!GLUTEN_DISH_RE.test(dish) && !GLUTEN_STAPLE_RE.test(staple)) diets.push("glutenfree");
+  rec.dietTags = diets;
+
+  // --- Seasons ---
+  const seasons = [];
+  if (rec.method === "grill" || /salad|ceviche|gazpacho|papaya|fattoush|tabbouleh|elote|skewer|kebab|kabob|poke|tartare|aguachile/.test(dish) ||
+      (dessert && /ice cream|sorbet|mango|berry|coconut|sago|bingsu|float|fruit|lime|açaí|acai|popsicle|granita|paleta|sundae/.test(text))) seasons.push("summer");
+  if (rec.method === "crockpot" || rec.method === "oven" ||
+      /stew|braise|roast|soup|chowder|gratin|tagine|goulash|curry|gumbo|pot pie|casserole|hot pot|cassoulet|ragu|ragù|bourguignon|sauerbraten|étouffée|etouffee/.test(dish) ||
+      (dessert && /apple|pumpkin|spice|cinnamon|chestnut|\bfig\b|caramel|pecan|maple/.test(text))) seasons.push("fall");
+  if (/roast|casserole|gratin|cornbread|stuffing|pot pie|brined|glazed turkey/.test(dish) ||
+      (dessert && /pecan|pumpkin|apple|caramel|tres leches|bread pudding|cobbler|sweet potato|cranberry/.test(text))) seasons.push("thanksgiving");
+  if (rec.styleLabel === "Holiday" || /\bham\b|goose|prime rib|wellington|festive/.test(dish) ||
+      (dessert && /panettone|lebkuchen|king cake|gingerbread|stollen|black forest|yule|melomakarona|turrón|turron|doberge|kataifi|fruitcake|cookie|peppermint|eggnog|honey|cinnamon|chebakia/.test(text))) seasons.push("christmas");
+  if (rec.protein === "Lamb" || /\blamb\b|\bham\b|brunch|asparagus|spring|deviled|quiche|frittata/.test(dish) ||
+      (dessert && /carrot|lemon|coconut|ricotta|hot cross|simnel|paska|babka|honey|cheesecake/.test(text))) seasons.push("easter");
+  rec.seasonTags = seasons;
+}
+
+
 /* ---------- Recipe generation ---------- */
 const RECIPES = [];
 const SUB_INDEX = {};   // subId -> { sub, cuisine, recipes: [] }
@@ -66,6 +145,7 @@ const CUISINE_INDEX = {};
               staple: pick(r, sub.staples),
               seed: comboSeed + k
             };
+            applyTags(recipe);
             RECIPES.push(recipe);
             SUB_INDEX[sub.id].recipes.push(recipe);
             CUISINE_INDEX[cuisine.id].recipes.push(recipe);
@@ -98,6 +178,7 @@ const CUISINE_INDEX = {};
             staple: pick(r, sub.sweet),
             seed
           };
+          applyTags(recipe);
           RECIPES.push(recipe);
           SUB_INDEX[sub.id].recipes.push(recipe);
           CUISINE_INDEX[cuisine.id].recipes.push(recipe);
@@ -106,6 +187,50 @@ const CUISINE_INDEX = {};
     }
   }
 })();
+
+/* ---------- Top-nav: Categories, Ingredients Hub, Seasonal Hubs ---------- */
+const NAV = [
+  { label: "Categories", items: [
+    { label: "Breakfast Recipes", type: "meal", id: "breakfast" },
+    { label: "Lunch Recipes", type: "meal", id: "lunch" },
+    { label: "Dinner Recipes", type: "meal", id: "dinner" },
+    { label: "Dessert Recipes", type: "course", id: "dessert" },
+    { label: "Slow Cooker Recipes", type: "appliance", id: "slowcooker" },
+    { label: "Air Fryer Recipes", type: "appliance", id: "airfryer" },
+    { label: "Vegan Recipes", type: "diet", id: "vegan" },
+    { label: "Keto Recipes", type: "diet", id: "keto" },
+    { label: "Gluten-Free Recipes", type: "diet", id: "glutenfree" },
+    { label: "Mediterranean Recipes", type: "diet", id: "mediterranean" }
+  ]},
+  { label: "Ingredients Hub", items: [
+    { label: "Chicken Recipes", type: "ing", id: "chicken" },
+    { label: "Ground Beef Recipes", type: "ing", id: "beef" },
+    { label: "Salmon Recipes", type: "ing", id: "salmon" },
+    { label: "Shrimp Recipes", type: "ing", id: "shrimp" },
+    { label: "Potato Recipes", type: "ing", id: "potato" },
+    { label: "Rice Recipes", type: "ing", id: "rice" },
+    { label: "Pasta Recipes", type: "ing", id: "pasta" }
+  ]},
+  { label: "Seasonal Hubs", items: [
+    { label: "Summer Recipes", type: "season", id: "summer" },
+    { label: "Fall Recipes", type: "season", id: "fall" },
+    { label: "Thanksgiving Recipes", type: "season", id: "thanksgiving" },
+    { label: "Christmas Recipes", type: "season", id: "christmas" },
+    { label: "Easter Recipes", type: "season", id: "easter" }
+  ]}
+];
+
+function tagMatch(rec, type, id) {
+  switch (type) {
+    case "course": return rec.course === id;
+    case "meal": return rec.mealTags.includes(id);
+    case "appliance": return rec.applianceTags.includes(id);
+    case "diet": return rec.dietTags.includes(id);
+    case "ing": return rec.ingredientTags.includes(id);
+    case "season": return rec.seasonTags.includes(id);
+    default: return false;
+  }
+}
 
 function buildName(style, protein, dish) {
   const prefix = style.id === "classic" ? "Classic"
@@ -225,12 +350,13 @@ function buildRecipeDetail(rec) {
 
 /* ---------- UI state ---------- */
 const PAGE_SIZE = 24;
-let state = { scope: null, page: 0, search: "", quick: null };
+let state = { scope: null, page: 0, search: "", quick: null, nav: null };
 
 const $ = (id) => document.getElementById(id);
 const columnsEl = $("cuisineColumns");
 const browserEl = $("browser");
 const gridEl = $("recipeGrid");
+const mainNav = $("mainNav");
 
 function fmtTime(min) {
   if (min < 60) return `${min} min`;
@@ -265,7 +391,8 @@ function renderColumns() {
 /* ---------- Recipe scope resolution ---------- */
 function currentRecipes() {
   let list;
-  if (state.quick === "quick30") list = RECIPES.filter((x) => x.time <= 30 && x.course !== "dessert");
+  if (state.nav) list = RECIPES.filter((x) => tagMatch(x, state.nav.type, state.nav.id));
+  else if (state.quick === "quick30") list = RECIPES.filter((x) => x.time <= 30 && x.course !== "dessert");
   else if (state.quick === "crockpot") list = RECIPES.filter((x) => x.method === "crockpot");
   else if (state.quick === "desserts") list = RECIPES.filter((x) => x.course === "dessert");
   else if (state.quick === "all") list = RECIPES;
@@ -303,6 +430,7 @@ function renderBrowser() {
 
   let title, sub;
   if (state.search) { title = `Search: “${state.search}”`; sub = ""; }
+  else if (state.nav) { title = state.nav.label; sub = state.nav.sub || ""; }
   else if (state.quick === "quick30") { title = "⏱️ 30-Minute Meals"; sub = "On the table in half an hour or less."; }
   else if (state.quick === "crockpot") { title = "🍲 Crock Pot Meals"; sub = "Set it in the morning, eat well tonight."; }
   else if (state.quick === "desserts") { title = "🍰 Desserts"; sub = "Traditional sweets from every cuisine."; }
@@ -341,7 +469,8 @@ function renderBrowser() {
 }
 
 function goHome() {
-  state = { scope: null, page: 0, search: "", quick: null };
+  state = { scope: null, page: 0, search: "", quick: null, nav: null };
+  closeNavMenus();
   $("searchInput").value = "";
   $("filter30").checked = $("filterCrock").checked = $("filterVeg").checked = $("filterDessert").checked = false;
   browserEl.classList.add("hidden");
@@ -382,6 +511,51 @@ function closeModal() {
   document.body.style.overflow = "";
 }
 
+/* ---------- Top nav rendering & handlers ---------- */
+function closeNavMenus() {
+  mainNav.querySelectorAll(".nav-group.open").forEach((g) => g.classList.remove("open"));
+}
+function renderNav() {
+  const home = `<button class="nav-home" data-home="1">🏠 Home</button>`;
+  const groups = NAV.map((g, gi) => `
+    <div class="nav-group">
+      <button class="nav-trigger" data-group="${gi}">${g.label} <span class="caret">▾</span></button>
+      <div class="nav-menu">
+        ${g.items.map((it) => {
+          const count = RECIPES.filter((x) => tagMatch(x, it.type, it.id)).length;
+          return `<button class="nav-item" data-type="${it.type}" data-id="${it.id}" data-label="${it.label}">
+            ${it.label} <span class="nav-count">${count.toLocaleString()}</span></button>`;
+        }).join("")}
+      </div>
+    </div>`).join("");
+  mainNav.innerHTML = home + groups;
+}
+renderNav();
+
+mainNav.addEventListener("click", (e) => {
+  const trigger = e.target.closest(".nav-trigger");
+  const item = e.target.closest(".nav-item");
+  const home = e.target.closest("[data-home]");
+  if (home) { goHome(); return; }
+  if (trigger) {
+    const group = trigger.parentElement;
+    const wasOpen = group.classList.contains("open");
+    closeNavMenus();
+    if (!wasOpen) group.classList.add("open");
+    e.stopPropagation();
+    return;
+  }
+  if (item) {
+    state = { scope: null, page: 0, search: "", quick: null,
+      nav: { type: item.dataset.type, id: item.dataset.id, label: item.dataset.label } };
+    $("searchInput").value = "";
+    $("filter30").checked = $("filterCrock").checked = $("filterVeg").checked = $("filterDessert").checked = false;
+    closeNavMenus();
+    renderBrowser();
+  }
+});
+document.addEventListener("click", (e) => { if (!e.target.closest(".nav-group")) closeNavMenus(); });
+
 /* ---------- Wire up events ---------- */
 renderColumns();
 $("totalCount").textContent = `${RECIPES.length.toLocaleString()} recipes`;
@@ -391,17 +565,17 @@ columnsEl.addEventListener("click", (e) => {
   const subBtn = e.target.closest("[data-sub]");
   const dessertBtn = e.target.closest("[data-desserts]");
   const allBtn = e.target.closest("[data-cuisine]");
-  if (subBtn) { state = { ...state, scope: { type: "sub", id: subBtn.dataset.sub }, quick: null, page: 0 }; renderBrowser(); }
+  if (subBtn) { state = { ...state, nav: null, scope: { type: "sub", id: subBtn.dataset.sub }, quick: null, page: 0 }; renderBrowser(); }
   else if (dessertBtn) {
-    state = { ...state, scope: { type: "cuisine", id: dessertBtn.dataset.desserts }, quick: null, page: 0 };
+    state = { ...state, nav: null, scope: { type: "cuisine", id: dessertBtn.dataset.desserts }, quick: null, page: 0 };
     $("filterDessert").checked = true;
     renderBrowser();
   }
-  else if (allBtn) { state = { ...state, scope: { type: "cuisine", id: allBtn.dataset.cuisine }, quick: null, page: 0 }; renderBrowser(); }
+  else if (allBtn) { state = { ...state, nav: null, scope: { type: "cuisine", id: allBtn.dataset.cuisine }, quick: null, page: 0 }; renderBrowser(); }
 });
 
 document.querySelectorAll("[data-quick]").forEach((b) =>
-  b.addEventListener("click", () => { state = { scope: null, page: 0, search: "", quick: b.dataset.quick }; renderBrowser(); }));
+  b.addEventListener("click", () => { state = { scope: null, page: 0, search: "", quick: b.dataset.quick, nav: null }; renderBrowser(); }));
 
 $("backBtn").addEventListener("click", goHome);
 $("brandHome").addEventListener("click", (e) => { e.preventDefault(); goHome(); });
@@ -413,7 +587,7 @@ $("searchInput").addEventListener("input", (e) => {
     state.search = e.target.value.trim();
     state.page = 0;
     if (state.search) renderBrowser();
-    else if (!state.scope && !state.quick) goHome();
+    else if (!state.scope && !state.quick && !state.nav) goHome();
     else renderBrowser();
   }, 200);
 });
