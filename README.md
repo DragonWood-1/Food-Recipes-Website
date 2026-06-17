@@ -1,4 +1,4 @@
-# Global Kitchen — Food Recipes Website
+# Foodie World — Food Recipes Website
 
 A fast, dependency-free recipe website with **7,000+ recipes** organized into
 seven cuisine columns, plus dedicated collections for **30-minute meals**,

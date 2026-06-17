@@ -1,5 +1,5 @@
 /* =========================================================================
-   Global Kitchen — recipe generation + UI
+   Foodie World — recipe generation + UI
    ========================================================================= */
 
 /* ---------- Deterministic PRNG (so the same 5,000+ recipes appear on

@@ -1,5 +1,5 @@
 /* =========================================================================
-   Global Kitchen — cuisine & dish template data
+   Foodie World — cuisine & dish template data
    Recipes are generated deterministically in app.js from these templates:
    each sub-cuisine defines base dishes and variation axes, and the
    combinations yield 5,000+ unique recipes site-wide. Each sub-cuisine
