@@ -29,7 +29,6 @@ function rint(r, min, max) { return min + Math.floor(r() * (max - min + 1)); }
 const BREAKFAST_RE = /congee|miso soup|onigiri|menemen|shakshuka|chilaquiles|migas|upma|dosa|uttapam|idli|omelette|manakish|pão de queijo|pao de queijo|porridge|curd rice/i;
 const BREAKFAST_SWEET_RE = /pancake|waffle|beignet|concha|hotteok|donut|doughnut|sfenj|berliner|madeleine|scone|churro|taiyaki|dorayaki/i;
 const LUNCHY_RE = /soup|salad|sandwich|bowl|wrap|taco|banh mi|po' boy|po'boy|roll|pita|gyro|shawarma|\bbun\b|chowder|pho|noodle/i;
-const NOSOUP_RE = /soup|stew|congee|broth|chowder|jhol|\bdal\b|sambar|rasam|gumbo|hot pot|jjigae|tom yum|tom kha|pho|harira|pozole|canh|bisque/i;
 const NONVEGAN_RE = /yogurt|cream|butter|cheese|milk|ghee|honey|mascarpone|custard|condensed|egg/i;
 const VEGAN_SWEET_RE = /coconut|fruit|mango|berry|sorbet|sago|fig|date|tapioca|lime|passion|açaí|acai|guava|pandan/i;
 const KETO_BLOCK_RE = /rice|noodle|bread|naan|roti|pita|tortilla|pasta|spaghetti|penne|dumpling|\bbun\b|taco|burrito|pav|samosa|couscous|bulgur|pancake|sandwich|jambalaya|paella|biryani|risotto|congee|lo mein|ramen|udon|chow|pho|wonton|spring roll|dosa|idli|uttapam|frankie|empanada|croqueta|coxinha|pide|lahmacun|manakish|börek|borek|pierogi|po'boy|po' boy|frito|nacho|quesadilla|enchilada|tamale|gnocchi|spätzle|spatzle/i;
@@ -38,6 +37,10 @@ const DAIRY_EGG = new Set(["Paneer", "Feta", "Halloumi", "Egg"]);
 const GLUTEN_DISH_RE = /noodle|lo mein|chow mein|chow fun|ramen|udon|soba|yakisoba|wonton|dumpling|gyoza|momo|spring roll|cha gio|schnitzel|katsu|tempura|pancake|okonomiyaki|pajeon|börek|borek|pide|lahmacun|manakish|pita|naan|roti|baguette|\bbread\b|sandwich|po' boy|po'boy|banh mi|pasta|lasagna|spaghetti|carbonara|gnocchi|spätzle|spatzle|\bpav\b|frankie|samosa|empanada|croqueta|coxinha|pierogi|manti|crêpe|crepe|waffle|beignet|churro|baklav|cannoli|strudel|donut|doughnut|berliner|sfenj|cake|cookie|\bpie\b|tart|zeppole|profiterole|madeleine|jalebi|gulab jamun|maamoul|chebakia|ghriba|biscuit|scone|brioche|panettone|stollen|lebkuchen|toast|burger|wrap|gozleme|simit|pretzel|galette|cobbler|crumble|crisp|shortcake|bread pudding|frito|nacho|quesadilla|enchilada|tostada|sopaipilla|sopapilla|concha|frankie|revani/i;
 const GLUTEN_STAPLE_RE = /flour tortilla|noodle|bread|naan|pita|baguette|pasta|spaghetti|penne|spätzle|spatzle|\bbun\b|pav|couscous|bulgur|simit|ciabatta|khobz|luchi|bhakri|panko|crust|wheat/i;
 const MED_SUBS = new Set(["greek", "italian", "spanish", "french", "lebanese", "turkish", "moroccan"]);
+// Genuinely crispy/fried dishes only (stir-fries are stripped out before testing).
+const FRYABLE_RE = /\bfr(y|ied|ies)\b|deep-fried|crispy|\bcrisp\b|katsu|tonkatsu|tempura|schnitzel|cutlet|milanesa|breaded|\bwing|nugget|popper|fritter|croquet|coxinha|arancini|rangoon|\bbhaji\b|pakora|\bvada\b|\bbonda\b|falafel|hush ?pupp|calamari|onion ring|spring roll|egg roll|lumpia|cha gio|samosa|empanada|taquito|flauta|chimichanga|tostada|sopaip|sopap|\bsope|chilaquile|karaage|gyoza|potsticker|frites|pajeon|banh xeo|\bdosa\b|uttapam|crab cake|currywurst|frikadelle|keftede|kibbeh|b[öo]rek|bastilla|\bnacho|\bfrito|migas|amritsari|chongqing|salt and pepper|patatas bravas|batata harra/i;
+// True ground / minced beef dishes (vs. steak, strips, or braised cuts).
+const GROUND_BEEF_RE = /kofta|kafta|kefta|köfte|kofte|keema|kheema|qeema|picadillo|picadinho|chili con carne|meatball|meatloaf|albondiga|albóndiga|polpette|keftede|frikadelle|kibbeh|kibbe|lasagna|lasagne|bolognese|\bragu\b|ragù|moussaka|pastitsio|\blarb\b|laab|mince|minced|mapo|\btaco|enchilada|burrito|\bnacho|frito pie|taco soup|sloppy|dirty rice|lahmacun|manti|escondidinho|krapow|basil stir-fry|salisbury/i;
 
 function applyTags(rec) {
   const dish = rec.dish.toLowerCase();
@@ -49,7 +52,7 @@ function applyTags(rec) {
   // --- Ingredient hub ---
   const ing = [];
   if (rec.protein === "Chicken") ing.push("chicken");
-  if (rec.protein === "Beef") ing.push("beef");
+  if (rec.protein === "Beef" && GROUND_BEEF_RE.test(dish)) ing.push("beef");
   if (rec.protein === "Salmon") ing.push("salmon");
   if (rec.protein === "Shrimp") ing.push("shrimp");
   if (rec.protein === "Potato" || /potato|aloo|batata|\bpapa\b|fingerling/.test(dish) || /potato/.test(staple)) ing.push("potato");
@@ -70,7 +73,11 @@ function applyTags(rec) {
   // --- Appliance ---
   const appliance = [];
   if (rec.method === "crockpot") appliance.push("slowcooker");
-  if (!dessert && rec.method !== "crockpot" && !NOSOUP_RE.test(dish)) appliance.push("airfryer");
+  if (!dessert && rec.method !== "crockpot") {
+    // Strip wok dishes (stir-fries, fried rice/noodles) so they don't count as fried.
+    const fryDish = dish.replace(/stir-?fr(y|ied)|fried rice|fried noodles?/g, " ");
+    if (FRYABLE_RE.test(fryDish)) appliance.push("airfryer");
+  }
   rec.applianceTags = appliance;
 
   // --- Diets ---
