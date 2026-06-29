@@ -237,10 +237,48 @@ h1, h2, h3 { font-family: "Playfair Display", Georgia, serif; }
 .step-list li { padding: 6px 0; font-size: 0.94rem; }
 
 /* ---------- Footer ---------- */
+/* ---------- Home editorial content ---------- */
+.home-content {
+  max-width: 860px; margin: 0 auto; padding: 8px 24px 56px;
+}
+.content-block {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 28px 32px; margin-bottom: 22px;
+}
+.content-block h2 {
+  font-size: 1.5rem; margin-bottom: 14px; color: var(--ink);
+}
+.content-block p { margin-bottom: 14px; color: var(--ink); line-height: 1.7; }
+.content-block p:last-child { margin-bottom: 0; }
+.content-list { margin: 6px 0 0; padding-left: 22px; }
+.content-list li { margin-bottom: 14px; line-height: 1.7; }
+.content-list li:last-child { margin-bottom: 0; }
+
+/* ---------- Footer ---------- */
 .site-footer {
-  border-top: 1px solid var(--line); padding: 28px 24px; text-align: center;
+  border-top: 1px solid var(--line); padding: 32px 24px; text-align: center;
   color: var(--ink-soft); font-size: 0.85rem;
 }
+.footer-links {
+  display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: center;
+  margin-bottom: 16px;
+}
+.footer-links a {
+  color: var(--ink); text-decoration: none; font-weight: 600;
+}
+.footer-links a:hover { color: var(--accent); text-decoration: underline; }
+.footer-copy { margin-top: 10px; font-size: 0.78rem; opacity: 0.85; }
+
+/* ---------- Static content pages ---------- */
+.page-wrap { max-width: 800px; margin: 0 auto; padding: 40px 24px 64px; }
+.page-wrap h1 { font-size: 2rem; margin-bottom: 8px; }
+.page-wrap .updated { color: var(--ink-soft); font-size: 0.85rem; margin-bottom: 28px; }
+.page-wrap h2 { font-size: 1.3rem; margin: 28px 0 12px; }
+.page-wrap p, .page-wrap li { line-height: 1.7; margin-bottom: 12px; color: var(--ink); }
+.page-wrap ul { padding-left: 22px; }
+.page-back { display: inline-block; margin-bottom: 24px; color: var(--accent); text-decoration: none; font-weight: 600; }
+.page-back:hover { text-decoration: underline; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {

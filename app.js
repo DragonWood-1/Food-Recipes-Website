@@ -471,6 +471,7 @@ function renderBrowser() {
 
   columnsEl.classList.add("hidden");
   document.querySelector(".hero").classList.add("hidden");
+  $("homeContent").classList.add("hidden");
   browserEl.classList.remove("hidden");
   window.scrollTo({ top: 0 });
 }
@@ -483,6 +484,7 @@ function goHome() {
   browserEl.classList.add("hidden");
   columnsEl.classList.remove("hidden");
   document.querySelector(".hero").classList.remove("hidden");
+  $("homeContent").classList.remove("hidden");
   window.scrollTo({ top: 0 });
 }
 

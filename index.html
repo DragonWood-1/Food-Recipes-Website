@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Foodie World — 5,000+ Recipes from Around the World</title>
-  <meta name="description" content="Explore over 5,000 recipes organized by cuisine: Asian, European, Latin American, Middle Eastern & African, Regional Chinese, Regional Indian, and Regional American. Plus 30-minute meals and crock pot favorites." />
+  <title>Foodie World — World Recipes, 30-Minute Meals &amp; Slow Cooker Dinners</title>
+  <meta name="description" content="Foodie World is a home-cooking guide to world cuisines — Asian, European, Latin American, Middle Eastern, African and regional American cooking — with practical techniques, 30-minute meals, slow cooker dinners, and desserts." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
@@ -42,6 +42,94 @@
     <!-- Cuisine columns: one column per cuisine family -->
     <section id="cuisineColumns" class="cuisine-columns" aria-label="Browse by cuisine"></section>
 
+    <!-- Original editorial content (home view) -->
+    <section id="homeContent" class="home-content">
+      <article class="content-block">
+        <h2>Welcome to Foodie World</h2>
+        <p>
+          Foodie World is a home-cooking resource built around a simple idea: the
+          best way to learn to cook is to understand how the world's kitchens
+          actually work. Instead of chasing one-off viral recipes, we organize
+          cooking the way cuisines really developed — by region, by the
+          ingredients a place had on hand, and by the techniques that turn those
+          ingredients into dinner. Whether you stumbled in looking for a fast
+          weeknight stir-fry or you want to finally understand the difference
+          between a Sichuan and a Cantonese kitchen, the goal here is the same:
+          send you back to your stove with a plan you can actually follow.
+        </p>
+        <p>
+          Every collection on this site is grouped into seven broad culinary
+          regions and twenty-seven sub-cuisines. Within each, you'll find the
+          signature dishes, the aromatics and spice blends that define them, and
+          the staples — rice, noodles, breads, and beans — that round out the
+          plate. We pay particular attention to the practical filters home cooks
+          care about most: how long a dish takes, whether it works in a slow
+          cooker, and whether it fits a vegetarian, vegan, keto, or gluten-free
+          diet.
+        </p>
+      </article>
+
+      <article class="content-block">
+        <h2>How to cook from any cuisine with confidence</h2>
+        <p>
+          Most cuisines are easier to learn than they look, because each one
+          leans on a small number of building blocks. Master those, and hundreds
+          of dishes open up. Here is the framework we use throughout the site:
+        </p>
+        <ul class="content-list">
+          <li>
+            <strong>Start with the aromatic base.</strong> Almost every regional
+            cuisine begins with a flavor foundation — the French
+            <em>mirepoix</em> of onion, carrot, and celery; the Cajun "holy
+            trinity" of onion, celery, and bell pepper; the Latin American
+            <em>sofrito</em>; the Indian <em>tadka</em> of whole spices bloomed in
+            hot fat; or the ginger-garlic-scallion trio at the heart of Chinese
+            cooking. Get the base right and the dish is already halfway there.
+          </li>
+          <li>
+            <strong>Pick a protein and a cooking method that match your time.</strong>
+            A quick sear or stir-fry rewards tender cuts and high heat; tougher,
+            cheaper cuts want the low, slow, hands-off approach of a braise or a
+            slow cooker. Knowing which method a cut is suited to is the single
+            biggest predictor of whether a dish turns out well.
+          </li>
+          <li>
+            <strong>Finish with acid, salt, and texture.</strong> A squeeze of
+            citrus, a spoon of pickle or yogurt, a scatter of toasted nuts or
+            fresh herbs — these final touches are what separate a flat dish from a
+            balanced one. When something tastes "almost there," it usually needs
+            acid or salt, not more cooking.
+          </li>
+        </ul>
+      </article>
+
+      <article class="content-block">
+        <h2>30-minute meals, slow cooker dinners, and planning ahead</h2>
+        <p>
+          Weeknight cooking is a logistics problem as much as a culinary one. For
+          the nights when you have half an hour, our <strong>30-Minute Meals</strong>
+          collection focuses on dishes built for speed: quick-cooking proteins,
+          pantry-friendly sauces, and minimal prep. The trick to fast cooking is
+          doing all your chopping and measuring before the pan ever gets hot — a
+          habit professional kitchens call <em>mise en place</em>.
+        </p>
+        <p>
+          For busier days, the <strong>Slow Cooker</strong> collection takes the
+          opposite approach: a few minutes of prep in the morning, then six to
+          eight hours of unattended cooking that turns inexpensive cuts and dried
+          beans into deeply flavored stews, curries, and braises. Slow cookers
+          excel at exactly the dishes that are hardest to rush — and they make
+          batch-cooking for the week genuinely practical.
+        </p>
+        <p>
+          However you cook tonight, use the navigation above to browse by
+          category, by main ingredient, or by season. Each collection is a
+          starting point, not a rulebook — adjust the spice, swap the protein, and
+          make it your own.
+        </p>
+      </article>
+    </section>
+
     <!-- Recipe browser (hidden until a cuisine/filter/search is chosen) -->
     <section id="browser" class="browser hidden">
       <div class="browser-head">
@@ -78,7 +166,15 @@
   </div>
 
   <footer class="site-footer">
-    <p>Foodie World — a recipe library spanning Asia, Europe, Latin America, the Middle East &amp; Africa, and regional traditions of China, India, and America.</p>
+    <nav class="footer-links" aria-label="Site information">
+      <a href="about.html">About</a>
+      <a href="guides.html">Cooking Guides</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Use</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <p>Foodie World — a home-cooking guide spanning Asia, Europe, Latin America, the Middle East &amp; Africa, and regional traditions of China, India, and America.</p>
+    <p class="footer-copy">&copy; 2026 Foodie World. All recipes and written guides are original content created for this site.</p>
   </footer>
 
   <script src="data.js"></script>
